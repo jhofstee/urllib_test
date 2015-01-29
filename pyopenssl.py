@@ -162,6 +162,7 @@ def get_subj_alt_name(peer_cert):
 
     return dns_name
 
+ssl_sessions = {}
 
 class WrappedSocket(object):
     '''API-compatibility wrapper for Python OpenSSL's Connection-class.
@@ -293,11 +294,21 @@ def ssl_wrap_socket(sock, keyfile=None, certfile=None, cert_reqs=None,
     ctx.set_cipher_list(DEFAULT_SSL_CIPHER_LIST)
 
     cnx = OpenSSL.SSL.Connection(ctx, sock)
+    # when there is a stored ssl session for the host in question,
+    # use it to as an attempt to prevent a full certificate exchange.
+    # If the host cleaned the session data, tls will fall back to an
+    # full key exchange.
+    if server_hostname in ssl_sessions:
+        cnx.set_session(ssl_sessions[server_hostname])
     cnx.set_tlsext_host_name(server_hostname)
     cnx.set_connect_state()
     while True:
         try:
             cnx.do_handshake()
+            # after a succesfull the ssl session is stored. This can be
+            # reused on the next connection to the same host, to skip a
+            # full certificate exchange.
+            ssl_sessions[server_hostname] = cnx.get_session()
         except OpenSSL.SSL.WantReadError:
             select.select([sock], [], [])
             continue
