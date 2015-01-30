@@ -59,10 +59,10 @@ from socket import _fileobject, timeout
 import ssl
 import select
 
-from .. import connection
-from .. import util
+#from .. import connection
+#from .. import util
 
-__all__ = ['inject_into_urllib3', 'extract_from_urllib3']
+#__all__ = ['inject_into_urllib3', 'extract_from_urllib3']
 
 # SNI only *really* works if we can read the subjectAltName of certificates.
 HAS_SNI = SUBJ_ALT_NAME_SUPPORT
@@ -103,22 +103,22 @@ DEFAULT_SSL_CIPHER_LIST = "ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:" + \
     "!aNULL:!MD5:!DSS"
 
 
-orig_util_HAS_SNI = util.HAS_SNI
-orig_connection_ssl_wrap_socket = connection.ssl_wrap_socket
+#orig_util_HAS_SNI = util.HAS_SNI
+#orig_connection_ssl_wrap_socket = connection.ssl_wrap_socket
 
 
-def inject_into_urllib3():
-    'Monkey-patch urllib3 with PyOpenSSL-backed SSL-support.'
+#def inject_into_urllib3():
+#    'Monkey-patch urllib3 with PyOpenSSL-backed SSL-support.'
+#
+#    connection.ssl_wrap_socket = ssl_wrap_socket
+#    util.HAS_SNI = HAS_SNI
 
-    connection.ssl_wrap_socket = ssl_wrap_socket
-    util.HAS_SNI = HAS_SNI
 
-
-def extract_from_urllib3():
-    'Undo monkey-patching by :func:`inject_into_urllib3`.'
-
-    connection.ssl_wrap_socket = orig_connection_ssl_wrap_socket
-    util.HAS_SNI = orig_util_HAS_SNI
+#def extract_from_urllib3():
+#    'Undo monkey-patching by :func:`inject_into_urllib3`.'
+#
+#    connection.ssl_wrap_socket = orig_connection_ssl_wrap_socket
+#    util.HAS_SNI = orig_util_HAS_SNI
 
 
 ### Note: This is a slightly bug-fixed version of same from ndg-httpsclient.
